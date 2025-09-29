@@ -32,6 +32,11 @@ const Dashboard = ({ isWorking, setIsWorking }) => {
   const [workSummary, setWorkSummary] = useState([]);
   const [apiToken, setApiToken] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isOnHold, setIsOnHold] = useState(false);
+  const [pausedTime, setPausedTime] = useState(0);
+  const [heldProjectId, setHeldProjectId] = useState(null);
+  const [heldTaskId, setHeldTaskId] = useState(null);
+  const [heldNote, setHeldNote] = useState('');
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -127,15 +132,15 @@ const Dashboard = ({ isWorking, setIsWorking }) => {
 
   useEffect(() => {
     let interval;
-    if (isWorking && startTime) {
+    if (isWorking && !isOnHold && startTime) {
       interval = setInterval(() => {
-        setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+        setElapsedTime(pausedTime + Math.floor((Date.now() - startTime) / 1000));
       }, 1000);
     } else {
-      setElapsedTime(0); // Reset elapsed time when not working
+      clearInterval(interval);
     }
     return () => clearInterval(interval);
-  }, [isWorking, startTime]);
+  }, [isWorking, isOnHold, startTime, pausedTime]);
 
   useEffect(() => {
     // When isWorking becomes false, it means work has stopped.
@@ -178,19 +183,22 @@ const Dashboard = ({ isWorking, setIsWorking }) => {
     fetchTasks();
   }, [projectId]);
 
-  const handleStartWork = async (taskIdFromUrgent) => {
+  const handleStartWork = async (taskIdToUse = taskId, projectToUse = projectId, noteToUse = note, isContinuing = false) => {
     setStartWorkLoading(true);
     try {
-      const payload = { project_id: projectId || null, task_id: taskIdFromUrgent || taskId || null, note: note || '' };
+      const payload = { project_id: projectToUse || null, task_id: taskIdToUse || null, note: noteToUse || '' };
       await window.electronAPI.startWork(payload);
       setSuccess('Work started successfully');
       setError(null);
-      setNote('');
-      setTaskId('');
+      // Do NOT reset note and taskId here if continuing
+      // setNote('');
+      // setTaskId('');
       setIsWorking(true);
       const now = Date.now();
-      setStartTime(now);
-      localStorage.setItem('workStartTime', now);
+      // If continuing, adjust startTime based on pausedTime
+      const newStartTime = isContinuing ? now - (pausedTime * 1000) : now;
+      setStartTime(newStartTime);
+      localStorage.setItem('workStartTime', newStartTime); // Store the adjusted start time
       if (window.electronAPI) {
         window.electronAPI.startIdleTimer();
       }
@@ -203,18 +211,19 @@ const Dashboard = ({ isWorking, setIsWorking }) => {
     }
   };
 
-  const handleEndWork = async (noteContent) => {
+  const handleEndWork = async (noteContent, isTemporaryPause = false) => {
     setEndWorkLoading(true);
     try {
       await window.electronAPI.endWork({ note: noteContent || '' });
       setSuccess('Work ended successfully');
       setError(null);
-      setNote('');
-      setIsWorking(false);
-      setElapsedTime(0);
-      localStorage.removeItem('workStartTime');
-      if (window.electronAPI) {
-        window.electronAPI.stopIdleTimer();
+      if (!isTemporaryPause) { // Only set to false if it's a full stop
+        setIsWorking(false);
+        setElapsedTime(0);
+        localStorage.removeItem('workStartTime');
+        if (window.electronAPI) {
+          window.electronAPI.stopIdleTimer();
+        }
       }
     } catch (err) {
       setError('Failed to end work');
@@ -223,6 +232,26 @@ const Dashboard = ({ isWorking, setIsWorking }) => {
       setEndWorkLoading(false);
       fetchTodayActivity();
     }
+  };
+
+  const handleHoldWork = async () => {
+    await handleEndWork(note, true); // Pass true for temporary pause
+    setIsOnHold(true);
+    setPausedTime(elapsedTime);
+    setHeldProjectId(projectId); // Save current project
+    setHeldTaskId(taskId);       // Save current task
+    setHeldNote(note);           // Save current note
+  };
+
+  const handleContinueWork = async () => {
+    // Use the held values to restart work, and indicate it's a continuation
+    await handleStartWork(heldTaskId, heldProjectId, heldNote, true); // Pass true for isContinuing
+    setIsOnHold(false);
+    // Clear held state after continuing
+    setHeldProjectId(null);
+    setHeldTaskId(null);
+    setHeldNote('');
+    setPausedTime(0); // Reset pausedTime after continuing
   };
 
   const handleCompleteUrgentTask = async (taskId) => {
@@ -267,6 +296,9 @@ const Dashboard = ({ isWorking, setIsWorking }) => {
           setTaskId={setTaskId}
           startWorkLoading={startWorkLoading}
           handleStartWork={handleStartWork}
+          isOnHold={isOnHold}
+          handleHoldWork={handleHoldWork}
+          handleContinueWork={handleContinueWork}
         />
         <TodayActivityPanel todayActivity={todayActivity} totalHours={totalHours} />
       </Box>

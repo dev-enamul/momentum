@@ -14,7 +14,7 @@ import {
   CircularProgress,
   Autocomplete
 } from '@mui/material';
-import { PlayArrow, Stop } from '@mui/icons-material';
+import { PlayArrow, Stop, Pause } from '@mui/icons-material';
 
 const StartWorkPanel = ({
   isWorkStarted,
@@ -33,6 +33,9 @@ const StartWorkPanel = ({
   setTaskId,
   startWorkLoading,
   handleStartWork,
+  isOnHold,
+  handleHoldWork,
+  handleContinueWork,
 }) => {
   const formatTime = (seconds) => {
     const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
@@ -71,6 +74,15 @@ const StartWorkPanel = ({
           {isWorkStarted ? (
             <>
               <TextField fullWidth label="Note" value={note} onChange={(e) => setNote(e.target.value)} sx={{ mt: 1 }} multiline rows={2} size="small" />
+              {isOnHold ? (
+                <Button variant="contained" color="success" onClick={handleContinueWork} sx={{ mt: 1, mr: 1 }} startIcon={<PlayArrow />} size="small">
+                  Continue
+                </Button>
+              ) : (
+                <Button variant="contained" color="warning" onClick={handleHoldWork} sx={{ mt: 1, mr: 1 }} startIcon={<Pause />} size="small">
+                  Hold
+                </Button>
+              )}
               <Button variant="contained" color="error" onClick={() => handleEndWork(note)} sx={{ mt: 1 }} disabled={endWorkLoading} startIcon={<Stop />} size="small">
                 {endWorkLoading ? 'Ending Work...' : 'End Work'}
               </Button>

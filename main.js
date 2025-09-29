@@ -62,7 +62,7 @@ function createWindow() {
 
   loadUrlWithRetries(startUrl); 
  
-  win.webContents.openDevTools();
+  // win.webContents.openDevTools();
   
   win.on('close', (e) => {
     e.preventDefault();

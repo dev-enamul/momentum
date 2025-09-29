@@ -7,6 +7,7 @@ import Tasks from './components/Tasks';
 import AddTask from './components/AddTask';
 import Menu from './components/Menu';
 import ProjectDetails from './components/ProjectDetails';
+import ChangePassword from './components/ChangePassword';
 import { Box } from '@mui/material';
 
 function App() {
@@ -56,6 +57,7 @@ function App() {
           <Route path="/project/:id" element={loggedIn ? <ProjectDetails /> : <Navigate to="/login" />} />
           <Route path="/tasks" element={loggedIn ? <Tasks /> : <Navigate to="/login" />} />
           <Route path="/add-task" element={loggedIn ? <AddTask /> : <Navigate to="/login" />} />
+          <Route path="/change-password" element={loggedIn ? <ChangePassword /> : <Navigate to="/login" />} />
           <Route path="*" element={<Navigate to={loggedIn ? "/dashboard" : "/login"} />} />
         </Routes>
       </Box>

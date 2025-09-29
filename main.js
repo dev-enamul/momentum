@@ -62,7 +62,7 @@ function createWindow() {
 
   loadUrlWithRetries(startUrl); 
  
-  // win.webContents.openDevTools();
+  win.webContents.openDevTools();
   
   win.on('close', (e) => {
     e.preventDefault();
@@ -103,6 +103,7 @@ app.whenReady().then(() => {
   powerMonitor.on('suspend', async () => {
     if (apiToken) {
       await endWork({ note: 'System suspended' });
+      win.webContents.send('end-work-due-to-idle');
     }
   });
 
@@ -242,10 +243,13 @@ let idleInterval;
 
 ipcMain.on('start-idle-timer', () => {
   let idleTime = 0;
-  idleInterval = setInterval(() => {
+  idleInterval = setInterval(async () => {
     idleTime = powerMonitor.getSystemIdleTime();
     console.log(`System idle time: ${idleTime} seconds`);
     if (idleTime >= 600) { // 10 minutes
+      if (apiToken) {
+        await endWork({ note: 'Ended due to inactivity' });
+      }
       win.webContents.send('end-work-due-to-idle');
       clearInterval(idleInterval);
     }

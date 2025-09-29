@@ -131,9 +131,23 @@ const Dashboard = ({ isWorking, setIsWorking }) => {
       interval = setInterval(() => {
         setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
       }, 1000);
+    } else {
+      setElapsedTime(0); // Reset elapsed time when not working
     }
     return () => clearInterval(interval);
   }, [isWorking, startTime]);
+
+  useEffect(() => {
+    // When isWorking becomes false, it means work has stopped.
+    // We should refresh the activity log and clean up.
+    if (!isWorking) {
+      fetchTodayActivity();
+      localStorage.removeItem('workStartTime');
+      if (window.electronAPI) {
+        window.electronAPI.stopIdleTimer();
+      }
+    }
+  }, [isWorking]);
 
 
 

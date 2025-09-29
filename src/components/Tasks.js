@@ -62,7 +62,7 @@ const Tasks = () => {
     project_filter: 'all',
     status: 'all',
     assign_by: 'all',
-    assign_to_filter: 'all',
+    assign_to: 'all',
     keyword: ''
   });
 
@@ -280,9 +280,9 @@ const Tasks = () => {
               <Autocomplete
                 options={employees}
                 getOptionLabel={(option) => option.name || ""}
-                value={employees.find(emp => emp.user_id === filters.assign_to_filter) || null}
+                value={employees.find(emp => emp.user_id === filters.assign_to) || null}
                 onChange={(event, newValue) => {
-                  handleFilterChange('assign_to_filter', newValue ? newValue.user_id : 'all');
+                  handleFilterChange('assign_to', newValue ? newValue.user_id : 'all');
                 }}
                 renderInput={(params) => (
                   <TextField {...params} label="Assign To" variant="outlined" size="small" />

@@ -27,9 +27,14 @@ import {
   IconButton,
   Tooltip,
   Autocomplete,
-  TablePagination
+  TablePagination,
+  Grid,
+  Chip,
+  Menu,
+  ListItemIcon,
+  ListItemText
 } from '@mui/material';
-import { Edit, Delete, Add, CheckCircle, AssignmentInd } from '@mui/icons-material';
+import { Edit, Delete, Add, CheckCircle, AssignmentInd, Info, Schedule, HourglassEmpty, Person, PriorityHigh, Folder as ProjectIcon, MoreVert } from '@mui/icons-material';
 import apiFetch, { completeTask, assignTask } from '../utils/api';
 import usePaginatedFetch from '../hooks/usePaginatedFetch';
 import PageLayout from './layout/PageLayout';
@@ -45,7 +50,10 @@ const Tasks = () => {
   const [open, setOpen] = useState(false);
   const [dialogLoading, setDialogLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState({});
-  const [initialLoading, setInitialLoading] = useState(true);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [selectedTaskDetails, setSelectedTaskDetails] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
 
   const {
     data: tasks,
@@ -123,14 +131,49 @@ const Tasks = () => {
   };
 
   const handleEdit = (task) => {
-    setEditingTask({
+    let submitTime = '';
+    if (task.submit_time) {
+      const parts = task.submit_time.split(/[- :]/);
+      if (parts.length >= 3) {
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
+        const day = parseInt(parts[2], 10);
+        const date = new Date(Date.UTC(year, month, day));
+        submitTime = date.toISOString().split('T')[0];
+      }
+    }
+
+    const formattedTask = {
       ...task,
-      assign_to: task.assign_by // Make sure assign_to is populated for the dialog
-    });
+      priority: task.priority_id, // Use priority_id for the Select component
+      submit_time: submitTime
+    };
+
+    setEditingTask(formattedTask);
     setOpen(true);
   };
 
   const handleClose = () => setOpen(false);
+
+  const handleOpenDetailsModal = (task) => {
+    setSelectedTaskDetails(task);
+    setDetailsModalOpen(true);
+  };
+
+  const handleCloseDetailsModal = () => {
+    setDetailsModalOpen(false);
+    setSelectedTaskDetails(null);
+  };
+
+  const handleMenuOpen = (event, taskId) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedTaskId(taskId);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setSelectedTaskId(null);
+  };
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
@@ -210,12 +253,12 @@ const Tasks = () => {
             {selectedTasks.length} selected
           </Typography>
           <Tooltip title="Complete Selected">
-            <IconButton color="inherit" onClick={() => handleCompleteTasks(selectedTasks)}>
+            <IconButton color="secondary" onClick={() => handleCompleteTasks(selectedTasks)}>
               <CheckCircle />
             </IconButton>
           </Tooltip>
           <Tooltip title="Assign Selected">
-            <IconButton color="inherit" onClick={() => handleOpenAssignModal(selectedTasks)}>
+            <IconButton color="secondary" onClick={() => handleOpenAssignModal(selectedTasks)}>
               <AssignmentInd />
             </IconButton>
           </Tooltip>
@@ -347,7 +390,6 @@ const Tasks = () => {
                           </TableCell>
                           <TableCell>
                           <Typography variant="subtitle1">{task.title}</Typography>
-                          <Typography variant="body2" color="textSecondary">{task.description}</Typography>
                           </TableCell>
                           <TableCell>{task.project || '-'}</TableCell>
                           <TableCell>{task.priority}</TableCell>
@@ -356,26 +398,55 @@ const Tasks = () => {
                           <TableCell>{employees.find(e => e.user_id === task.assign_by)?.name || '-'}</TableCell>
                           <TableCell>{task.status}</TableCell>
                           <TableCell align="right">
-                              <Tooltip title="Complete">
-                                  <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleCompleteTasks([task.id]); }}>
-                                      <CheckCircle />
-                                  </IconButton>
-                              </Tooltip>
-                              <Tooltip title="Assign">
-                                  <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleOpenAssignModal([task.id]); }}>
-                                      <AssignmentInd />
-                                  </IconButton>
-                              </Tooltip>
-                              <Tooltip title="Edit">
-                                  <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleEdit(task); }} disabled={!task.canManage}>
-                                      <Edit />
-                                  </IconButton>
-                              </Tooltip>
-                              <Tooltip title="Delete">
-                                  <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleDelete(task.id); }} disabled={!task.canManage || deleteLoading[task.id]}>
-                                      {deleteLoading[task.id] ? <CircularProgress size={20} /> : <Delete />}
-                                  </IconButton>
-                              </Tooltip>
+                            <IconButton
+                              aria-label="more"
+                              aria-controls="long-menu"
+                              aria-haspopup="true"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleMenuOpen(e, task.id);
+                              }}
+                            >
+                              <MoreVert />
+                            </IconButton>
+                            <Menu
+                              id="long-menu"
+                              anchorEl={anchorEl}
+                              keepMounted
+                              open={Boolean(anchorEl && selectedTaskId === task.id)}
+                              onClose={handleMenuClose}
+                            >
+                              <MenuItem onClick={() => { handleOpenDetailsModal(task); handleMenuClose(); }}>
+                                <ListItemIcon>
+                                  <Info fontSize="small" />
+                                </ListItemIcon>
+                                <ListItemText>Details</ListItemText>
+                              </MenuItem>
+                              <MenuItem onClick={() => { handleCompleteTasks([task.id]); handleMenuClose(); }}>
+                                <ListItemIcon>
+                                  <CheckCircle fontSize="small" />
+                                </ListItemIcon>
+                                <ListItemText>Complete</ListItemText>
+                              </MenuItem>
+                              <MenuItem onClick={() => { handleOpenAssignModal([task.id]); handleMenuClose(); }}>
+                                <ListItemIcon>
+                                  <AssignmentInd fontSize="small" />
+                                </ListItemIcon>
+                                <ListItemText>Assign</ListItemText>
+                              </MenuItem>
+                              <MenuItem onClick={() => { handleEdit(task); handleMenuClose(); }} disabled={!task.canManage}>
+                                <ListItemIcon>
+                                  <Edit fontSize="small" />
+                                </ListItemIcon>
+                                <ListItemText>Edit</ListItemText>
+                              </MenuItem>
+                              <MenuItem onClick={() => { handleDelete(task.id); handleMenuClose(); }} disabled={!task.canManage}>
+                                <ListItemIcon>
+                                  <Delete fontSize="small" />
+                                </ListItemIcon>
+                                <ListItemText>Delete</ListItemText>
+                              </MenuItem>
+                            </Menu>
                           </TableCell>
                       </TableRow>
                   );
@@ -511,6 +582,46 @@ const Tasks = () => {
           </Button>
           </DialogActions>
       </Dialog>
+      )}
+
+      {selectedTaskDetails && (
+        <Dialog open={detailsModalOpen} onClose={handleCloseDetailsModal} fullWidth maxWidth="sm">
+          <DialogTitle>Task Details</DialogTitle>
+          <DialogContent>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <Typography variant="h5" gutterBottom>{selectedTaskDetails.title}</Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Chip icon={<ProjectIcon />} label={`Project: ${selectedTaskDetails.project || '-'}`} />
+              </Grid>
+              <Grid item xs={6}>
+                <Chip icon={<PriorityHigh />} label={`Priority: ${selectedTaskDetails.priority}`} />
+              </Grid>
+              <Grid item xs={6}>
+                <Chip icon={<Schedule />} label={`Estimated Time: ${selectedTaskDetails.estimated_time || 0} Hours`} />
+              </Grid>
+              <Grid item xs={6}>
+                <Chip icon={<HourglassEmpty />} label={`Time Spent: ${selectedTaskDetails.time_spent || '-'}`} />
+              </Grid>
+              <Grid item xs={6}>
+                <Chip icon={<Person />} label={`Assigned By: ${employees.find(e => e.user_id === selectedTaskDetails.assign_by)?.name || '-'}`} />
+              </Grid>
+              <Grid item xs={6}>
+                <Chip icon={<CheckCircle />} label={`Status: ${selectedTaskDetails.status}`} />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="subtitle1" gutterBottom sx={{ mt: 2 }}>Description</Typography>
+                <Typography variant="body2" color="textSecondary">
+                  {selectedTaskDetails.description}
+                </Typography>
+              </Grid>
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDetailsModal}>Close</Button>
+          </DialogActions>
+        </Dialog>
       )}
 
 

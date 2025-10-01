@@ -5,7 +5,7 @@ import Dashboard from './components/Dashboard';
 import Projects from './components/Projects';
 import Tasks from './components/Tasks';
 import AddTask from './components/AddTask';
-import Menu from './components/Menu';
+import BottomNavbar from './components/layout/BottomNavbar';
 import ProjectDetails from './components/ProjectDetails';
 import ChangePassword from './components/ChangePassword';
 import { Box } from '@mui/material';
@@ -48,7 +48,7 @@ function App() {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-      {loggedIn && <Menu setLoggedIn={setLoggedIn} />}
+      {loggedIn && <BottomNavbar setLoggedIn={setLoggedIn} />}
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <Routes>
           <Route path="/login" element={loggedIn ? <Navigate to="/dashboard" /> : <Login setLoggedIn={setLoggedIn} key={loggedIn} />} />

@@ -271,7 +271,7 @@ const Dashboard = ({ isWorking, setIsWorking }) => {
   };
 
   return (
-    <Box sx={{ flexGrow: 1, backgroundColor: '#f4f6f8', display: 'flex', flexDirection: 'column', overflow: 'hidden', p: 2 }}>
+    <Box sx={{ flexGrow: 1, backgroundColor: '#f4f6f8', display: 'flex', flexDirection: 'column', overflow: 'hidden',  p: 2 }}>
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={loading}

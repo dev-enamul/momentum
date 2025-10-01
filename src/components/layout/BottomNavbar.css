@@ -1,0 +1,69 @@
+
+body {
+    background: linear-gradient(to bottom, white, #f0f0f0);
+  }
+  
+  .bottom-navbar {
+    background-color: transparent !important;
+    border-bottom: 4px solid #92288E;
+    box-shadow: none !important;
+    width: 100%;
+  }
+  
+  .menu-container {
+    background-color: #92288E;
+    border-radius: 15px 15px 0 0;
+    display: flex;
+    justify-content: center;
+    padding: 6px 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 550px;
+  }
+  
+  .menu-link {
+    color: white !important;
+    font-weight: bold !important;
+    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out !important;
+    margin: 0 8px !important;
+  }
+  
+  .menu-link:hover {
+    transform: scale(1.1);
+    color: #FFD700 !important;
+  }
+  
+
+  
+.user-profile {
+  
+  position: absolute;
+  
+  left: 10px;
+  
+  bottom: 0px;
+  
+}
+  
+
+  
+.profile-avatar {
+  
+  width: 32px !important;
+  
+  height: 32px !important;
+  
+  border: 2px solid #92288E;
+  
+}
+  
+  .profile-menu .MuiPaper-root {
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    margin-top: 8px;
+  }
+  
+  .profile-menu .MuiMenuItem-root {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+  

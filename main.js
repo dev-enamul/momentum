@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Menu, Tray, powerMonitor } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, Tray, powerMonitor, screen } = require('electron');
 const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
@@ -35,8 +35,12 @@ app.on('before-quit', async (e) => {
 });
 
 function createWindow() {
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width, height } = primaryDisplay.workAreaSize;
+
   win = new BrowserWindow({
-    fullscreen: true,
+    width: Math.round(width * 0.8),
+    height: Math.round(height * 0.8),
     title: "Momentum",
     icon: path.join(app.isPackaged ? process.resourcesPath : __dirname, 'icon.png'),
     webPreferences: {
@@ -106,7 +110,7 @@ app.whenReady().then(() => {
     }
   });
 
-  const screenshotsDir = path.join(__dirname, 'screenshots');
+  const screenshotsDir = path.join(app.getPath('userData'), 'screenshots');
   if (!fs.existsSync(screenshotsDir)) fs.mkdirSync(screenshotsDir);
 });
 
@@ -191,7 +195,8 @@ function stopScreenshotInterval() {
 // Take and upload screenshot
 async function takeScreenshot() {
   console.log('takeScreenshot function called');
-  const filePath = path.join(__dirname, `screenshots/screenshot-${Date.now()}.png`);
+  const screenshotsDir = path.join(app.getPath('userData'), 'screenshots');
+  const filePath = path.join(screenshotsDir, `screenshot-${Date.now()}.png`);
   try {
     await screenshot({ filename: filePath });
 
@@ -245,7 +250,7 @@ ipcMain.on('start-idle-timer', () => {
   idleInterval = setInterval(async () => {
     idleTime = powerMonitor.getSystemIdleTime();
     console.log(`System idle time: ${idleTime} seconds`);
-    if (idleTime >= 600) { // 10 minutes
+    if (idleTime >= 3600) { // 60 minutes
       if (apiToken) {
         await endWork({ note: 'Ended due to inactivity' });
       }

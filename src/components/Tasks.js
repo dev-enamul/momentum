@@ -55,6 +55,9 @@ const Tasks = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
 
+  const user = JSON.parse(localStorage.getItem('user'));
+  const authUserId = user ? user.id : null;
+
   const {
     data: tasks,
     loading: tasksLoading,
@@ -367,6 +370,7 @@ const Tasks = () => {
                   <TableCell sx={{ fontWeight: 'bold' }}>Estimated Time</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Time Spent</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Assigned By</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Assign To</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
                   <TableCell align="right" sx={{ fontWeight: 'bold' }}>Actions</TableCell>
               </TableRow>
@@ -395,7 +399,8 @@ const Tasks = () => {
                           <TableCell>{task.priority}</TableCell>
                           <TableCell>{task.estimated_time||0} Hours</TableCell>
                           <TableCell>{task.time_spent || '-'}</TableCell>
-                          <TableCell>{employees.find(e => e.user_id === task.assign_by)?.name || '-'}</TableCell>
+                          <TableCell>{task.assign_by === authUserId ? 'You' : (employees.find(e => e.user_id === task.assign_by)?.name || '-')}</TableCell>
+                          <TableCell>{task.assign_to === authUserId ? 'You' : (employees.find(e => e.user_id === task.assign_to)?.name || '-')}</TableCell>
                           <TableCell>{task.status}</TableCell>
                           <TableCell align="right">
                             <IconButton

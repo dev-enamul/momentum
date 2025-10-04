@@ -275,85 +275,81 @@ const Tasks = () => {
 
   return (
     <PageLayout title={selectedTasks.length > 0 ? `${selectedTasks.length} selected` : 'Tasks'} actions={renderAppBarActions()}>
-      <Card sx={{ mb: 2, backgroundColor: '#f4f6f8' }}>
-        <CardContent>
-          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-            <FormControl sx={{ flexGrow: 1 }} size="small">
-              <Autocomplete
-                options={projects}
-                getOptionLabel={(option) => option.title || 'Untitled Project'}
-                value={projects.find(proj => proj.id === filters.project_filter) || null}
-                onChange={(event, newValue) => {
-                  handleFilterChange('project_filter', newValue ? newValue.id : 'all');
-                }}
-                renderInput={(params) => (
-                  <TextField {...params} label="Project" variant="outlined" size="small" />
-                )}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-              />
-            </FormControl>
+      <Box sx={{ mb: 2, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+        <FormControl sx={{ flexGrow: 1 }} size="small">
+          <Autocomplete
+            options={projects}
+            getOptionLabel={(option) => option.title || 'Untitled Project'}
+            value={projects.find(proj => proj.id === filters.project_filter) || null}
+            onChange={(event, newValue) => {
+              handleFilterChange('project_filter', newValue ? newValue.id : 'all');
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Project" variant="outlined" size="small" />
+            )}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+          />
+        </FormControl>
 
-            <FormControl sx={{ flexGrow: 1 }} size="small">
-              <InputLabel>Status</InputLabel>
-              <Select
-                value={filters.status}
-                onChange={(e) => handleFilterChange('status', e.target.value)}
-                label="Status"
-              >
-                <MenuItem value="all">All</MenuItem>
-                <MenuItem value={0}>Pending</MenuItem>
-                <MenuItem value={1}>Completed</MenuItem>
-                <MenuItem value={2}>In Progress</MenuItem>
-              </Select>
-            </FormControl>
+        <FormControl sx={{ flexGrow: 1 }} size="small">
+          <InputLabel>Status</InputLabel>
+          <Select
+            value={filters.status}
+            onChange={(e) => handleFilterChange('status', e.target.value)}
+            label="Status"
+          >
+            <MenuItem value="all">All</MenuItem>
+            <MenuItem value={0}>Pending</MenuItem>
+            <MenuItem value={1}>Completed</MenuItem>
+            <MenuItem value={2}>In Progress</MenuItem>
+          </Select>
+        </FormControl>
 
-            <FormControl sx={{ flexGrow: 1 }} size="small">
-              <Autocomplete
-                options={employees}
-                getOptionLabel={(option) => option.name || ""}
-                value={employees.find(emp => emp.user_id === filters.assign_by) || null}
-                onChange={(event, newValue) => {
-                  handleFilterChange('assign_by', newValue ? newValue.user_id : 'all');
-                }}
-                renderInput={(params) => (
-                  <TextField {...params} label="Assign By" variant="outlined" size="small" />
-                )}
-                isOptionEqualToValue={(option, value) => option.user_id === value.user_id}
-              />
-            </FormControl>
+        <FormControl sx={{ flexGrow: 1 }} size="small">
+          <Autocomplete
+            options={employees}
+            getOptionLabel={(option) => option.name || ""}
+            value={employees.find(emp => emp.user_id === filters.assign_by) || null}
+            onChange={(event, newValue) => {
+              handleFilterChange('assign_by', newValue ? newValue.user_id : 'all');
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Assign By" variant="outlined" size="small" />
+            )}
+            isOptionEqualToValue={(option, value) => option.user_id === value.user_id}
+          />
+        </FormControl>
 
-            <FormControl sx={{ flexGrow: 1 }} size="small">
-              <Autocomplete
-                options={employees}
-                getOptionLabel={(option) => option.name || ""}
-                value={employees.find(emp => emp.user_id === filters.assign_to) || null}
-                onChange={(event, newValue) => {
-                  handleFilterChange('assign_to', newValue ? newValue.user_id : 'all');
-                }}
-                renderInput={(params) => (
-                  <TextField {...params} label="Assign To" variant="outlined" size="small" />
-                )}
-                isOptionEqualToValue={(option, value) => option.user_id === value.user_id}
-              />
-            </FormControl>
+        <FormControl sx={{ flexGrow: 1 }} size="small">
+          <Autocomplete
+            options={employees}
+            getOptionLabel={(option) => option.name || ""}
+            value={employees.find(emp => emp.user_id === filters.assign_to) || null}
+            onChange={(event, newValue) => {
+              handleFilterChange('assign_to', newValue ? newValue.user_id : 'all');
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Assign To" variant="outlined" size="small" />
+            )}
+            isOptionEqualToValue={(option, value) => option.user_id === value.user_id}
+          />
+        </FormControl>
 
-            <TextField
-              sx={{ flexGrow: 1 }}
-              label="Keyword"
-              size="small"
-              value={filters.keyword}
-              onChange={(e) => handleFilterChange('keyword', e.target.value)}
-            />
-          </Box>
-        </CardContent>
-      </Card>
+        <TextField
+          sx={{ flexGrow: 1 }}
+          label="Keyword"
+          size="small"
+          value={filters.keyword}
+          onChange={(e) => handleFilterChange('keyword', e.target.value)}
+        />
+      </Box>
 
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 200 }}>
           <CircularProgress />
         </Box>
       ) : (
-        <TableContainer component={Paper} sx={{ backgroundColor: '#f4f6f8' }}>
+        <TableContainer component={Paper}>
           <Table size="small">
             <TableHead>
               <TableRow>
@@ -387,7 +383,7 @@ const Tasks = () => {
                           aria-checked={isItemSelected}
                           tabIndex={-1}
                           selected={isItemSelected}
-                          sx={{ '&:nth-of-type(odd)': { backgroundColor: '#f9f9f9' } }}
+                          sx={{ '&:nth-of-type(odd)': { backgroundColor: 'rgba(0, 0, 0, 0.04)' } }}
                       >
                           <TableCell padding="checkbox">
                               <Checkbox checked={isItemSelected} />

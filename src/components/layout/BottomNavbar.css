@@ -1,9 +1,10 @@
 
 body {
-    background: linear-gradient(to bottom, white, #f0f0f0);
+    background-color: #f4f6f8;
   }
   
   .bottom-navbar {
+    /* background-color: rgba(146, 40, 142, 0.3) !important; */
     background-color: transparent !important;
     border-bottom: 4px solid #92288E;
     box-shadow: none !important;

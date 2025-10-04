@@ -41,69 +41,65 @@ const ChangePassword = () => {
   };
 
   return (
-    <PageLayout title="Change Password">
-      <Container component="main" maxWidth="xs">
-        <Box
-          sx={{
-            marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Typography component="h1" variant="h5">
-            Change Password
-          </Typography>
-          <Box component="form" onSubmit={handleChangePassword} noValidate sx={{ mt: 1 }}>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="old_password"
-              label="Old Password"
-              type="password"
-              id="old_password"
-              value={oldPassword}
-              onChange={(e) => setOldPassword(e.target.value)}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="New Password"
-              type="password"
-              id="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="confirm_password"
-              label="Confirm New Password"
-              type="password"
-id="confirm_password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-            {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
-            {success && <Alert severity="success" sx={{ mt: 2 }}>{success}</Alert>}
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-              disabled={loading}
-            >
-              {loading ? <CircularProgress size={24} /> : 'Change Password'}
-            </Button>
+        <PageLayout title="Change Password">
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <Typography component="h1" variant="h5">
+              Change Password
+            </Typography>
+            <Box component="form" onSubmit={handleChangePassword} noValidate sx={{ mt: 1, width: '100%', maxWidth: '400px' }}>
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="old_password"
+                label="Old Password"
+                type="password"
+                id="old_password"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="password"
+                label="New Password"
+                type="password"
+                id="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="confirm_password"
+                label="Confirm New Password"
+                type="password"
+                id="confirm_password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+              {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+              {success && <Alert severity="success" sx={{ mt: 2 }}>{success}</Alert>}
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+                disabled={loading}
+              >
+                {loading ? <CircularProgress size={24} /> : 'Change Password'}
+              </Button>
+            </Box>
           </Box>
-        </Box>
-      </Container>
-    </PageLayout>
-  );
+        </PageLayout>  );
 };
 
 export default ChangePassword;

@@ -11,6 +11,8 @@ import UrgentTasksPanel from './dashboard/UrgentTasksPanel';
 import ProjectSummaryPanel from './dashboard/ProjectSummaryPanel';
 import WorkSummaryPanel from './dashboard/WorkSummaryPanel';
 
+import PageLayout from './layout/PageLayout';
+
 const Dashboard = ({ isWorking, setIsWorking }) => {
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);
@@ -271,7 +273,7 @@ const Dashboard = ({ isWorking, setIsWorking }) => {
   };
 
   return (
-    <Box sx={{ flexGrow: 1, backgroundColor: '#f4f6f8', display: 'flex', flexDirection: 'column', overflow: 'hidden',  p: 2 }}>
+    <PageLayout title="Dashboard">
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={loading}
@@ -321,7 +323,7 @@ const Dashboard = ({ isWorking, setIsWorking }) => {
       />
 
       <WorkSummaryPanel workSummary={workSummary} />
-    </Box>
+    </PageLayout>
   );
 };
 

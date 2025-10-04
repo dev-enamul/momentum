@@ -17,6 +17,8 @@ ChartJS.register(
   BarElement
 );
 
+import PageLayout from "./layout/PageLayout";
+
 const ProjectDetails = () => {
   const { id } = useParams();
   const [project, setProject] = useState(null);
@@ -118,7 +120,7 @@ const ProjectDetails = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <PageLayout title={project.project_title}>
       {/* TITLE + CUSTOMER + STATUS */}
       <Typography variant="h4">
         {project.project_title}
@@ -159,7 +161,7 @@ const ProjectDetails = () => {
           </Paper>
         </Grid>
       </Grid>
-    </Box>
+    </PageLayout>
   );
 };
 

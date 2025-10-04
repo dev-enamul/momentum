@@ -17,7 +17,7 @@ import {
   Autocomplete
 } from '@mui/material';
 import { Add, Delete } from '@mui/icons-material';
-import apiFetch from '../utils/api';
+import PageLayout from './layout/PageLayout';
 
 const AddTask = () => {
   const navigate = useNavigate();
@@ -96,18 +96,7 @@ const AddTask = () => {
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" sx={{ backgroundColor: '#f4f6f8', boxShadow: 'none', py: 0 }}>
-        <Container maxWidth="lg">
-          <Toolbar sx={{ minHeight: '48px !important' }}>
-            <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 'bold', color: 'black' }}>
-              Add Tasks
-            </Typography>
-          </Toolbar>
-        </Container>
-      </AppBar>
-
-      <Container maxWidth="lg" sx={{ mt: 2, mb: 4, p: 2, backgroundColor: '#f4f6f8'}} >
+    <PageLayout title="Add Tasks">
         {/* ✅ Project select (only once) */}
         <FormControl fullWidth margin="dense">
           <Autocomplete
@@ -222,8 +211,7 @@ const AddTask = () => {
             {loading ? 'Submitting...' : 'Submit All Tasks'}
           </Button>
         </Box>
-      </Container>
-    </Box>
+    </PageLayout>
   );
 };
 

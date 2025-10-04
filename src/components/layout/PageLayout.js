@@ -1,9 +1,24 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AppBar, Toolbar, Typography, Container, Box } from '@mui/material';
+import AnimatedBackground from './AnimatedBackground';
 
 const PageLayout = ({ title, children, actions }) => {
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset;
+      document.body.style.setProperty('--scrollTop', `${scrollTop}px`);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   return (
-    <Box sx={{ flexGrow: 1, backgroundColor: '#f4f6f8', minHeight: '100vh' }}>
+    <Box sx={{ flexGrow: 1, minHeight: '100vh' }}>
+      <AnimatedBackground />
       <AppBar position="static" sx={{ backgroundColor: '#92288E', boxShadow: 'none' }}>
         <Container maxWidth="lg">
           <Toolbar sx={{ minHeight: '48px !important' }}>

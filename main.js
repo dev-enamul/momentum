@@ -36,8 +36,7 @@ app.on('before-quit', async (e) => {
 
 function createWindow() {
   win = new BrowserWindow({
-    width: 1200,
-    height: 800,
+    fullscreen: true,
     title: "Momentum",
     icon: path.join(app.isPackaged ? process.resourcesPath : __dirname, 'icon.png'),
     webPreferences: {

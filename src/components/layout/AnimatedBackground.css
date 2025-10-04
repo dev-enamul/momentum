@@ -1,0 +1,95 @@
+@keyframes move-aurora {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) rotate(180deg) scale(1.2);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg) scale(1);
+  }
+}
+
+.animated-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-color: #ffffff;
+  overflow: hidden;
+  transform: translateY(calc(var(--scrollTop, 0) * 0.2px));
+}
+
+.animated-background::before, .animated-background::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 120vmax;
+  height: 120vmax;
+  border-radius: 50%;
+  animation: move-aurora 30s linear infinite;
+}
+
+.animated-background::before {
+  background: radial-gradient(circle at center, 
+    rgba(146, 40, 142, 0.15) 0%, 
+    rgba(146, 40, 142, 0.1) 20%, 
+    transparent 50%
+  );
+  animation-duration: 40s;
+}
+
+.animated-background::after {
+  background: radial-gradient(circle at center, 
+    rgba(56, 55, 149, 0.15) 0%, 
+    rgba(56, 55, 149, 0.1) 20%, 
+    transparent 50%
+  );
+  animation-duration: 35s;
+  animation-direction: alternate-reverse;
+}
+
+.animated-background span {
+  position: absolute;
+  border-radius: 50%;
+  animation: move-aurora 25s linear infinite alternate;
+}
+
+.animated-background span:nth-child(1) {
+  top: 20%;
+  left: 20%;
+  width: 60vmax;
+  height: 60vmax;
+  background: radial-gradient(circle at center, 
+    rgba(255, 255, 255, 0.9) 0%, 
+    transparent 50%
+  );
+  animation-duration: 50s;
+}
+
+.animated-background span:nth-child(2) {
+  top: 70%;
+  left: 80%;
+  width: 40vmax;
+  height: 40vmax;
+  background: radial-gradient(circle at center, 
+    rgba(146, 40, 142, 0.1) 0%, 
+    transparent 40%
+  );
+  animation-duration: 45s;
+}
+
+.animated-background span:nth-child(3) {
+  top: 80%;
+  left: 10%;
+  width: 80vmax;
+  height: 80vmax;
+  background: radial-gradient(circle at center, 
+    rgba(56, 55, 149, 0.1) 0%, 
+    transparent 40%
+  );
+  animation-duration: 55s;
+}

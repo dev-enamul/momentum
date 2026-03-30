@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
-import { AppBar, Toolbar, Typography, Container, Box } from '@mui/material';
+import { Container, Box } from '@mui/material';
 import AnimatedBackground from './AnimatedBackground';
+import BottomNavbar from './BottomNavbar';
 
-const PageLayout = ({ title, children, actions }) => {
+const PageLayout = ({ children, setLoggedIn, loggedIn }) => {
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.pageYOffset;
@@ -17,21 +18,12 @@ const PageLayout = ({ title, children, actions }) => {
   }, []);
 
   return (
-    <Box sx={{ flexGrow: 1, minHeight: '100vh' }}>
+    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
       <AnimatedBackground />
-      <AppBar position="static" sx={{ backgroundColor: '#92288E', boxShadow: 'none' }}>
-        <Container maxWidth="lg">
-          <Toolbar sx={{ minHeight: '48px !important' }}>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 'bold', color: 'white' }}>
-              {title}
-            </Typography>
-            {actions}
-          </Toolbar>
-        </Container>
-      </AppBar>
-      <Container maxWidth="lg" sx={{ py: 3 }}>
+      {loggedIn && <BottomNavbar setLoggedIn={setLoggedIn} />}
+      <Box component="main" sx={{ flexGrow: 1, p: loggedIn ? 3 : 0, overflow: 'auto' }}>
         {children}
-      </Container>
+      </Box>
     </Box>
   );
 };

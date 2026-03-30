@@ -43,6 +43,6 @@ root.render(
   </ThemeProvider>
 );
 
-window.electronAPI.onToggleWork((event, status) => {
+window.electronAPI?.onToggleWork((event, status) => {
   console.log('Toggling work status:', status);
 });

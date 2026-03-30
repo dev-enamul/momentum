@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Container, Box, TextField, Button, Typography, Alert, CircularProgress } from '@mui/material';
+import { Box, TextField, Button, Typography, Alert, CircularProgress, InputAdornment, IconButton } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import apiFetch from '../utils/api';
-import PageLayout from './layout/PageLayout';
 
 const ChangePassword = () => {
   const [oldPassword, setOldPassword] = useState('');
@@ -10,6 +10,9 @@ const ChangePassword = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showOld, setShowOld] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
@@ -28,7 +31,6 @@ const ChangePassword = () => {
         method: 'POST',
         body: { old_password: oldPassword, password: newPassword, confirm_password: confirmPassword },
       });
-
       setSuccess(result.message || 'Password changed successfully.');
       setOldPassword('');
       setNewPassword('');
@@ -41,65 +43,124 @@ const ChangePassword = () => {
   };
 
   return (
-        <PageLayout title="Change Password">
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
-          >
-            <Typography component="h1" variant="h5">
-              Change Password
-            </Typography>
-            <Box component="form" onSubmit={handleChangePassword} noValidate sx={{ mt: 1, width: '100%', maxWidth: '400px' }}>
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                name="old_password"
-                label="Old Password"
-                type="password"
-                id="old_password"
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
-              />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                name="password"
-                label="New Password"
-                type="password"
-                id="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-              />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                name="confirm_password"
-                label="Confirm New Password"
-                type="password"
-                id="confirm_password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-              {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
-              {success && <Alert severity="success" sx={{ mt: 2 }}>{success}</Alert>}
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}
-                disabled={loading}
-              >
-                {loading ? <CircularProgress size={24} /> : 'Change Password'}
-              </Button>
-            </Box>
-          </Box>
-        </PageLayout>  );
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+    <Box sx={{ maxWidth: 400, width: '100%' }}>
+      <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, color: '#1a1a1a' }}>
+        Change Password
+      </Typography>
+      <Typography variant="body2" sx={{ color: '#999', mb: 3, fontSize: '0.82rem' }}>
+        Update your account password below.
+      </Typography>
+
+      {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>}
+      {success && <Alert severity="success" sx={{ mb: 2, borderRadius: 2 }}>{success}</Alert>}
+
+      <Box component="form" onSubmit={handleChangePassword} noValidate>
+        <TextField
+          fullWidth
+          label="Old Password"
+          type={showOld ? 'text' : 'password'}
+          value={oldPassword}
+          onChange={(e) => setOldPassword(e.target.value)}
+          margin="normal"
+          required
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={() => setShowOld(v => !v)} edge="end" size="small"
+                  sx={{ color: '#bbb', '&:hover': { color: '#666' } }}>
+                  {showOld ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+          sx={fieldStyle}
+        />
+        <TextField
+          fullWidth
+          label="New Password"
+          type={showNew ? 'text' : 'password'}
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          margin="normal"
+          required
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={() => setShowNew(v => !v)} edge="end" size="small"
+                  sx={{ color: '#bbb', '&:hover': { color: '#666' } }}>
+                  {showNew ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+          sx={fieldStyle}
+        />
+        <TextField
+          fullWidth
+          label="Confirm New Password"
+          type={showConfirm ? 'text' : 'password'}
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          margin="normal"
+          required
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={() => setShowConfirm(v => !v)} edge="end" size="small"
+                  sx={{ color: '#bbb', '&:hover': { color: '#666' } }}>
+                  {showConfirm ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+          sx={fieldStyle}
+        />
+
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          disabled={loading}
+          sx={{
+            mt: 2.5, py: 1.1,
+            borderRadius: 2,
+            fontSize: '0.9rem',
+            fontWeight: 700,
+            textTransform: 'none',
+            bgcolor: '#92288E',
+            boxShadow: '0 4px 18px rgba(146,40,142,0.35)',
+            '&:hover': {
+              bgcolor: '#7a2078',
+              boxShadow: '0 6px 22px rgba(146,40,142,0.5)',
+              transform: 'translateY(-1px)',
+            },
+            '&:active': { transform: 'translateY(0)' },
+            '&.Mui-disabled': { bgcolor: '#ddd', color: '#aaa', boxShadow: 'none' },
+            transition: 'all 0.2s ease',
+          }}
+        >
+          {loading ? <CircularProgress size={20} sx={{ color: 'rgba(255,255,255,0.8)' }} /> : 'Change Password'}
+        </Button>
+      </Box>
+    </Box>
+    </Box>
+  );
+};
+
+const fieldStyle = {
+  '& .MuiOutlinedInput-root': {
+    borderRadius: 2,
+    bgcolor: '#fafafa',
+    fontSize: '0.88rem',
+    '& input': { py: '10px' },
+    '& fieldset': { borderColor: '#e8e8e8' },
+    '&:hover fieldset': { borderColor: '#92288E' },
+    '&.Mui-focused fieldset': { borderColor: '#92288E', borderWidth: '1.5px' },
+  },
+  '& .MuiInputLabel-root': { fontSize: '0.88rem', top: '-4px' },
+  '& .MuiInputLabel-root.MuiInputLabel-shrink': { top: '0px' },
+  '& .MuiInputLabel-root.Mui-focused': { color: '#92288E' },
 };
 
 export default ChangePassword;

@@ -1,10 +1,10 @@
-const { app, BrowserWindow, ipcMain, Menu, Tray, powerMonitor, screen } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, Tray, powerMonitor, screen, desktopCapturer } = require('electron');
 const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
 const axios = require('axios');
 const FormData = require('form-data');
-const screenshot = require('screenshot-desktop');
+const { autoUpdater } = require('electron-updater');
 
 let win;
 let tray;
@@ -39,7 +39,7 @@ function createWindow() {
   const { width, height } = primaryDisplay.workAreaSize;
 
   win = new BrowserWindow({
-    width: Math.round(width * 0.8),
+    width: Math.round(width * 0.6),
     height: Math.round(height * 0.8),
     title: "Momentum",
     icon: path.join(app.isPackaged ? process.resourcesPath : __dirname, 'icon.png'),
@@ -47,16 +47,17 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
-    }
+    },
+    resizable: true
   });
 
   const startUrl = process.env.ELECTRON_START_URL || `file://${path.join(__dirname, 'dist/index.html')}`;
 
-  const loadUrlWithRetries = (url, retries = 5) => {
+  const loadUrlWithRetries = (url, retries = 20) => {
     win.loadURL(url).catch(err => {
       console.log(`Failed to load URL: ${url}. Retrying... (${retries} attempts left)`);
       if (retries > 0) {
-        setTimeout(() => loadUrlWithRetries(url, retries - 1), 2000); // 2-second delay
+        setTimeout(() => loadUrlWithRetries(url, retries - 1), 2000);
       } else {
         console.error('Could not connect to development server.');
       }
@@ -65,7 +66,7 @@ function createWindow() {
 
   loadUrlWithRetries(startUrl); 
  
-  // win.webContents.openDevTools();
+  if (process.env.ELECTRON_START_URL) win.webContents.openDevTools();
   
   win.on('close', (e) => {
     e.preventDefault();
@@ -84,6 +85,27 @@ const loggedInMenuTemplate = [
 
 app.whenReady().then(() => {
   createWindow();
+
+  // Auto updater
+  if (app.isPackaged) {
+    autoUpdater.checkForUpdates();
+  }
+
+  autoUpdater.on('update-available', (info) => {
+    win.webContents.send('update-available', info.version);
+  });
+
+  autoUpdater.on('download-progress', (progress) => {
+    win.webContents.send('update-download-progress', Math.round(progress.percent));
+  });
+
+  autoUpdater.on('update-downloaded', () => {
+    win.webContents.send('update-downloaded');
+  });
+
+  ipcMain.on('install-update', () => {
+    autoUpdater.quitAndInstall();
+  });
 
   const menu = Menu.buildFromTemplate(loggedOutMenuTemplate);
   Menu.setApplicationMenu(menu);
@@ -167,8 +189,8 @@ async function endWork(payload) {
 
 // Screenshot interval every 5-10 minutes
 function scheduleNextScreenshot() {
-  const minMinutes = 5;
-  const maxMinutes = 10;
+  const minMinutes = 1;
+  const maxMinutes = 2;
   const randomInterval = Math.floor(Math.random() * (maxMinutes - minMinutes + 1) + minMinutes) * 60 * 1000;
   
   console.log(`Scheduling next screenshot in ${(randomInterval / 60000).toFixed(2)} minutes.`);
@@ -195,10 +217,23 @@ function stopScreenshotInterval() {
 // Take and upload screenshot
 async function takeScreenshot() {
   console.log('takeScreenshot function called');
-  const screenshotsDir = path.join(app.getPath('userData'), 'screenshots');
-  const filePath = path.join(screenshotsDir, `screenshot-${Date.now()}.png`);
   try {
-    await screenshot({ filename: filePath });
+    const sources = await desktopCapturer.getSources({
+      types: ['screen'],
+      thumbnailSize: { width: 1920, height: 1080 }
+    });
+
+    if (!sources || sources.length === 0) {
+      console.error('No screen sources found');
+      return;
+    }
+
+    const buffer = sources[0].thumbnail.toPNG();
+
+    const screenshotsDir = path.join(app.getPath('userData'), 'screenshots');
+    if (!fs.existsSync(screenshotsDir)) fs.mkdirSync(screenshotsDir);
+    const filePath = path.join(screenshotsDir, `screenshot-${Date.now()}.png`);
+    fs.writeFileSync(filePath, buffer);
 
     const form = new FormData();
     form.append('image', fs.createReadStream(filePath));

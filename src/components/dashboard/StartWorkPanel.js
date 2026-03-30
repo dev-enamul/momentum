@@ -1,4 +1,6 @@
 import React from 'react';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 import {
   Box,
   Button,
@@ -11,7 +13,6 @@ import {
   Alert,
   Card,
   CardContent,
-  CircularProgress,
   Autocomplete
 } from '@mui/material';
 import { PlayArrow, Stop, Pause } from '@mui/icons-material';
@@ -52,19 +53,21 @@ const StartWorkPanel = ({
             {isWorkStarted ? 'Work in Progress' : 'Start New Work'}
           </Typography>
 
+
+
+
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', my: 2 }}>
-            <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-              <CircularProgress variant="determinate" value={100} size={100} sx={{ color: 'grey.300' }} />
-              <CircularProgress
-                variant="determinate"
-                value={(elapsedTime % 60) * (100 / 60)}
-                size={100}
-                sx={{ color: '#1976d2', position: 'absolute', left: 0 }}
+            <Box sx={{ width: 150, height: 150 }}>
+              <CircularProgressbar
+                value={(elapsedTime % 60)}
+                maxValue={60}
+                text={formatTime(elapsedTime)}
+                styles={buildStyles({
+                  textColor: '#1976d2',
+                  pathColor: '#1976d2',
+                  trailColor: '#d6d6d6',
+                })}
               />
-              <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <Typography variant="h6" color="text.secondary">{formatTime(elapsedTime)}</Typography>
-                <Typography variant="caption" color="text.secondary">{isWorkStarted ? 'Running' : 'Idle'}</Typography>
-              </Box>
             </Box>
           </Box>
 

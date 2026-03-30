@@ -19,4 +19,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onEndWorkDueToIdle: (callback) => ipcRenderer.on('end-work-due-to-idle', callback),
   startIdleTimer: () => ipcRenderer.send('start-idle-timer'),
   stopIdleTimer: () => ipcRenderer.send('stop-idle-timer'),
+
+  onUpdateAvailable: (callback) => ipcRenderer.on('update-available', (_, version) => callback(version)),
+  onUpdateProgress: (callback) => ipcRenderer.on('update-download-progress', (_, percent) => callback(percent)),
+  onUpdateDownloaded: (callback) => ipcRenderer.on('update-downloaded', callback),
+  installUpdate: () => ipcRenderer.send('install-update'),
 });
